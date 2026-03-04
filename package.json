@@ -1,0 +1,27 @@
+{
+  "name": "@bananaseed/potassium",
+  "version": "1.0.0",
+  "description": "",
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "module": "dist/main.mjs",
+  "types": "dist/main.d.ts",
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "check": "tsc --noEmit"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "Ryan Childs",
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.16.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@bananaseed/event_stream": "^1.0.0"
+  }
+}
