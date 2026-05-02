@@ -1,28 +1,38 @@
 {
+  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    "module": "commonjs",
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "declaration": true,
-    "incremental": true,
-    "target": "es6",
-    "noImplicitAny": true,
-    "strict": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "exactOptionalPropertyTypes": true,
+    // File Layout
+    "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    }
+    "ignoreDeprecations": "6.0",
+
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "esnext",
+    "target": "esnext",
+    // "types": [],
+    // For nodejs:
+    "lib": ["esnext", "dom"],
+    "types": [],
+    // and npm install -D @types/node
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": true,
+
+    // Recommended Options
+    "strict": true,
+    "verbatimModuleSyntax": false,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "auto",
+    "skipLibCheck": true,
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.js"
-  ]
+  "include": ["src/**/*", "test/**/*", "examples/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
