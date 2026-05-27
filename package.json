@@ -11,8 +11,8 @@
     "url": "git+https://github.com/childsr/potassium.git"
   },
   "scripts": {
-    "watch": "parcel watch",
-    "build": "parcel build",
+    "watch": "vite build --watch",
+    "build": "vite build",
     "check": "tsc --noEmit",
     "test": "ts-node test/test1.ts"
   },
@@ -23,12 +23,11 @@
   "author": "Ryan Childs",
   "license": "MIT",
   "devDependencies": {
-    "@parcel/packager-ts": "^2.16.3",
-    "@parcel/transformer-typescript-types": "^2.16.3",
     "@types/node": "^25.3.3",
-    "parcel": "^2.16.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14",
+    "vite-plugin-dts": "^5.0.1"
   },
   "dependencies": {
     "@bananaseed/event_stream": "^1.0.0"

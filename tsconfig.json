@@ -1,28 +1,24 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "downlevelIteration": true,
     "declaration": true,
     "incremental": true,
-    "target": "es6",
+    "target": "es2022",
     "noImplicitAny": true,
     "strict": true,
-    "moduleResolution": "node",
     "sourceMap": true,
     "exactOptionalPropertyTypes": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    }
+    "types": ["node"],
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.js"
+    "src/**/*.js",
+    "test/**/*.ts"
   ]
 }
