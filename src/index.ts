@@ -11,7 +11,10 @@ type StreamHandlerPair<A,Payload> = [stream: EventStream<Payload>, handler: Hand
 
 interface AppShared<State,Context,TriggerMap extends Record<string,any>> {
   bind<T>(eventStream: EventStream<T>, handler: Handler<App<State,Context,TriggerMap>,T>): symbol
-  bind<K extends keyof TriggerMap>(triggerId: K, handler: Handler<App<State,Context,TriggerMap>,TriggerMap[K]>): symbol
+  bind<K extends keyof TriggerMap>(
+    triggerId: K,
+    handler: Handler<App<State,Context,TriggerMap>,TriggerMap[K]>
+  ): symbol
   onStop(handler: (app: App<State,Context,TriggerMap>) => void): symbol
 }
 
@@ -41,23 +44,41 @@ export interface App<
   stop(): void
 }
 
-class _Builder<State,Context,TriggerMap extends Record<string,any>> implements Builder<State,Context,TriggerMap> {
-  private triggerHandlers: Map<keyof TriggerMap, Map<symbol, Handler<App<State,Context,TriggerMap>,any>>> = new Map()
-  private onStartHandlers: Set<VoidHandler<App<State,Context,TriggerMap>>> = new Set()
-  private onStopHandlers: Map<symbol, VoidHandler<App<State,Context,TriggerMap>>> = new Map()
-  private eventHandlers: Map<symbol, StreamHandlerPair<App<State,Context,TriggerMap>,any>> = new Map()
-  private ctx: Context
+class _Builder<
+  State,
+  Context,
+  TriggerMap extends Record<string,any>
+> implements Builder<State,Context,TriggerMap> {
+  private triggerHandlers: Map<
+    keyof TriggerMap, Map<symbol, Handler<App<State,Context,TriggerMap>,any>>
+  > = new Map()
+  private onStartHandlers: Set<
+    VoidHandler<App<State,Context,TriggerMap>>
+  > = new Set()
+  private onStopHandlers: Map<
+    symbol, VoidHandler<App<State,Context,TriggerMap>>
+  > = new Map()
+  private eventHandlers: Map<
+    symbol, StreamHandlerPair<App<State,Context,TriggerMap>,any>
+  > = new Map()
+  private context: Context
 
-  constructor(ctx: Context) {
-    this.ctx = ctx
+  constructor(context: Context) {
+    this.context = context
   }
 
-  private bindEventStream<T>(eventStream: EventStream<T>, handler: Handler<App<State,Context,TriggerMap>,T>): symbol {
+  private bindEventStream<T>(
+    eventStream: EventStream<T>,
+    handler: Handler<App<State,Context,TriggerMap>,T>
+  ): symbol {
     const id = Symbol()
     this.eventHandlers.set(id, [eventStream, handler])
     return id
   }
-  private bindTriggerHandler<K extends keyof TriggerMap>(triggerId: K, handler: Handler<App<State,Context,TriggerMap>, TriggerMap[K]>): symbol {
+  private bindTriggerHandler<K extends keyof TriggerMap>(
+    triggerId: K,
+    handler: Handler<App<State,Context,TriggerMap>, TriggerMap[K]>
+  ): symbol {
     const id = Symbol()
     if (!this.triggerHandlers.has(triggerId)) {
       this.triggerHandlers.set(triggerId, new Map())
@@ -66,8 +87,6 @@ class _Builder<State,Context,TriggerMap extends Record<string,any>> implements B
     return id
   }
 
-  bind<T>(eventStream: EventStream<T>, handler: Handler<App<State,Context,TriggerMap>,T>): symbol
-  bind<K extends keyof TriggerMap>(triggerId: K, handler: Handler<App<State,Context,TriggerMap>,TriggerMap[K]>): symbol
   bind(a: any, b: any): symbol {
     return typeof a === "string"
       ? this.bindTriggerHandler(a,b)
@@ -86,7 +105,7 @@ class _Builder<State,Context,TriggerMap extends Record<string,any>> implements B
     return new Promise((resolve) => {
       const _runtime = new _App<State,Context,TriggerMap>({
         initialState,
-        context: this.ctx,
+        context: this.context,
         handlers: {
           triggerHandlers: this.triggerHandlers,
           onStartHandlers: this.onStartHandlers,
@@ -111,23 +130,35 @@ type AppParameters<State,Context,TriggerMap extends Record<string,any>> = {
   handlers: HandlerMap<State,Context,TriggerMap>
   resolve: (finalState: State) => void
 }
-class _App<State,Context,TriggerMap extends Record<string,any>> implements App<State,Context,TriggerMap> {
+class _App<
+  State,
+  Context,
+  TriggerMap extends Record<string,any>
+> implements App<State,Context,TriggerMap> {
   readonly context: Context
   state: State
 
-  private triggerHandlers: Map<keyof TriggerMap, Map<symbol, Handler<App<State,Context,TriggerMap>,any>>>
+  private triggerHandlers: Map<
+    keyof TriggerMap, Map<symbol, Handler<App<State,Context,TriggerMap>,any>>
+  >
   private onStopHandlers: Map<symbol, VoidHandler<App<State,Context,TriggerMap>>>
 
   private cancelControllers: Map<symbol, CancelController> = new Map()
 
   private resolve: (finalState: State) => void
 
-  private bindEventStream<T>(eventStream: EventStream<T>, handler: Handler<App<State,Context,TriggerMap>,T>, id: symbol = Symbol()): symbol {
+  private bindEventStream<T>(
+    eventStream: EventStream<T>,
+    handler: Handler<App<State,Context,TriggerMap>,T>, id: symbol = Symbol()
+  ): symbol {
     const cancelController = eventStream.listen(payload => handler(this, payload, id))
     this.cancelControllers.set(id, cancelController)
     return id
   }
-  private bindTriggerHandler<K extends keyof TriggerMap>(triggerId: K, handler: Handler<App<State,Context,TriggerMap>, TriggerMap[K]>): symbol {
+  private bindTriggerHandler<K extends keyof TriggerMap>(
+    triggerId: K,
+    handler: Handler<App<State,Context,TriggerMap>, TriggerMap[K]>
+  ): symbol {
     const id = Symbol()
     if (!this.triggerHandlers.has(triggerId)) {
       this.triggerHandlers.set(triggerId, new Map())
@@ -161,8 +192,6 @@ class _App<State,Context,TriggerMap extends Record<string,any>> implements App<S
       }
     }
   }
-  bind<T>(eventStream: EventStream<T>, handler: Handler<App<State,Context,TriggerMap>, T>): symbol
-  bind<K extends keyof TriggerMap>(triggerId: K, handler: Handler<App<State,Context,TriggerMap>, TriggerMap[K]>): symbol
   bind(a: any, b: any): symbol {
     return typeof a === "string"
       ? this.bindTriggerHandler(a,b)
