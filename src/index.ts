@@ -5,8 +5,8 @@ import { cloneMap } from "./util"
 export { EventStream, CancelController } from "@bananaseed/event_stream"
 
 export type Handler<A,Payload> = (app: A, payload: Payload, id: symbol) => void
-export type VoidHandler<A> = (app: A) => void
 
+type VoidHandler<A> = (app: A) => void
 type StreamHandlerPair<A,Payload> = [stream: EventStream<Payload>, handler: Handler<A,Payload>]
 
 interface AppShared<State,Context,TriggerMap extends Record<string,any>> {
@@ -15,15 +15,27 @@ interface AppShared<State,Context,TriggerMap extends Record<string,any>> {
   onStop(handler: (app: App<State,Context,TriggerMap>) => void): symbol
 }
 
-export interface Builder<State,Context,TriggerMap extends Record<string,any>> extends AppShared<State,Context,TriggerMap> {
-  onStart(handler: VoidHandler<App<State,Context,TriggerMap>>): void
+export interface Builder<
+  State,
+  Context,
+  TriggerMap extends Record<string,any>
+> extends AppShared<State,Context,TriggerMap> {
+  onStart(handler: (app: App<State,Context,TriggerMap>) => void): void
   start(initialState: State): Promise<State>
 }
-export interface App<State,Context,TriggerMap extends Record<string,any>> extends AppShared<State,Context,TriggerMap> {
+export interface App<
+  State,
+  Context,
+  TriggerMap extends Record<string,any>
+> extends AppShared<State,Context,TriggerMap> {
   readonly context: Context
   state: State
 
-  trigger<K extends keyof TriggerMap>(...args: TriggerMap[K] extends void ? [triggerId: K] : [triggerId: K, payload: TriggerMap[K]]): void
+  trigger<K extends keyof TriggerMap>(
+    ...args: TriggerMap[K] extends void
+      ? [triggerId: K]
+      : [triggerId: K, payload: TriggerMap[K]]
+  ): void
   unbind(id: symbol): boolean
   unbind<K extends keyof TriggerMap>(triggerId: K, id: symbol): boolean
   stop(): void
@@ -61,10 +73,10 @@ class _Builder<State,Context,TriggerMap extends Record<string,any>> implements B
       ? this.bindTriggerHandler(a,b)
       : this.bindEventStream(a,b)
   }
-  onStart(handler: VoidHandler<App<State,Context,TriggerMap>>): void {
+  onStart(handler: (app: App<State,Context,TriggerMap>) => void): void {
     this.onStartHandlers.add(handler)
   }
-  onStop(handler: VoidHandler<App<State,Context,TriggerMap>>): symbol {
+  onStop(handler: (app: App<State,Context,TriggerMap>) => void): symbol {
     const id = Symbol()
     this.onStopHandlers.set(id, handler)
     return id
