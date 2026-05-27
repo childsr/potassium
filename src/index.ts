@@ -1,6 +1,9 @@
 import { CancelController, EventStream } from "@bananaseed/event_stream"
 import { cloneMap } from "./util"
 
+// Re-export core reactive stream classes so consumers don't need separate imports 
+export { EventStream, CancelController } from "@bananaseed/event_stream"
+
 export type Handler<A,Payload> = (app: A, payload: Payload, id: symbol) => void
 export type VoidHandler<A> = (app: A) => void
 
