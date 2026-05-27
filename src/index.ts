@@ -20,7 +20,7 @@ export interface App<State,Context,TriggerMap extends Record<string,any>> extend
   readonly context: Context
   state: State
 
-  trigger<K extends keyof TriggerMap>(triggerId: K, payload: TriggerMap[K]): void
+  trigger<K extends keyof TriggerMap>(...args: TriggerMap[K] extends void ? [triggerId: K] : [triggerId: K, payload: TriggerMap[K]]): void
   unbind(id: symbol): boolean
   unbind<K extends keyof TriggerMap>(triggerId: K, id: symbol): boolean
   stop(): void
@@ -138,7 +138,7 @@ class _App<State,Context,TriggerMap extends Record<string,any>> implements App<S
     }
   }
 
-  trigger<K extends keyof TriggerMap>(triggerId: K, payload: TriggerMap[K]): void {
+  trigger(triggerId: any, payload?: any): void {
     const handlers = this.triggerHandlers.get(triggerId)
     if (handlers) {
       for (const [id, handler] of handlers.entries()) {
