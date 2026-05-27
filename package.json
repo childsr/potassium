@@ -2,6 +2,7 @@
   "name": "@bananaseed/potassium",
   "version": "1.0.1",
   "description": "",
+  "type": "module",
   "source": "src/index.ts",
   "main": "dist/main.js",
   "module": "dist/main.mjs",
@@ -14,7 +15,8 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "check": "tsc --noEmit",
-    "test": "ts-node test/test1.ts"
+    "test": "parcel test/index.html",
+    "test:node": "ts-node test/test1.ts"
   },
   "files": [
     "dist"
