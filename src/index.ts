@@ -2,7 +2,7 @@ import { type CancelController, EventStream } from "@bananaseed/event_stream"
 import { cloneMap } from "./util"
 
 // Re-export EventStream and CancelController so users don't need separate imports
-export { type CancelController, EventStream } from "@bananaseed/event_stream"
+export { type CancelController, EventStream, pushStream } from "@bananaseed/event_stream"
 
 export type Handler<A, Payload> = (app: A, payload: Payload, id: symbol) => void
 
