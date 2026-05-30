@@ -1,21 +1,22 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "ES2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "esModuleInterop": true,
     "declaration": true,
     "incremental": true,
-    "target": "es2022",
     "noImplicitAny": true,
     "strict": true,
     "sourceMap": true,
     "exactOptionalPropertyTypes": true,
     "outDir": "dist",
-    "types": ["node"],
-    "ignoreDeprecations": "6.0"
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/**/*.ts",

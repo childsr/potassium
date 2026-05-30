@@ -1,21 +1,20 @@
-import { createApp } from "../src"
-import { EventStream } from "@bananaseed/event_stream"
+import { createApp, EventStream } from "../src"
 
 type State = { count: number }
 
 const clickStream = EventStream.fromEventTarget(window, "click")
 
 function main() {
-  const app = createApp<State>()
+  const builder = createApp<State>()
 
-  app.onStart(() => console.log("Counter App Started. Click anywhere to increment!"))
+  builder.onStart(() => console.log("Counter App Started. Click anywhere to increment!"))
 
-  app.bind(clickStream, (app) => {
-    app.state.count++
-    console.log(`Count: ${app.state.count}`)
+  builder.bind(clickStream, k => {
+    k.state.count++
+    console.log(`Count: ${k.state.count}`)
   })
 
-  app.start({ count: 0 })
+  builder.start({ count: 0 })
 }
 
 main()

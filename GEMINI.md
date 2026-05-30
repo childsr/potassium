@@ -1,10 +1,10 @@
 # Potassium Project Overview
 
-Potassium is a TypeScript-based engine for tracking state and binding events to state changes. It provides a structured way to build stateful applications by decoupling event sources from state mutations and side effects.
+Potassium is a TypeScript-based engine for tracking state and binding events to state changes and side effects. It provides a structured way to build stateful applications by decoupling event sources from state mutations and side effects.
 
 ## Core Technologies
 - **Language:** TypeScript
-- **Build Tool:** [Parcel](https://parceljs.org/)
+- **Build Tool:** [Vite](https://vite.dev/)
 - **State Management:** Custom builder-pattern based app logic in `src/index.ts`.
 - **Event Handling:** Depends on `@bananaseed/event_stream` for reactive event streams.
 
@@ -16,14 +16,14 @@ Potassium is a TypeScript-based engine for tracking state and binding events to 
 ## Building and Running
 
 ### Development
-- **Watch mode:** `npm run watch` (uses Parcel to watch and rebuild)
+- **Watch mode:** `npm run watch` (uses Vite to watch and rebuild)
 - **Type checking:** `npm run check` (runs `tsc --noEmit`)
 
 ### Production
-- **Build:** `npm run build` (uses Parcel to generate the `dist` folder)
+- **Build:** `npm run build` (uses Vite to generate the `dist` folder)
 
 ### Testing
-- **Run tests:** `npm test` (executes `test/test1.ts` using `ts-node`)
+- Run tests with `npm run test`.
 
 ## Development Conventions
 
