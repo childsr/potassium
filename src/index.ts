@@ -15,6 +15,15 @@ interface AppShared<State, Context, TriggerMap extends Record<string, any>> {
     triggerId: K,
     handler: Handler<App<State, Context, TriggerMap>, TriggerMap[K]>
   ): symbol
+  /**
+   * Apply a handler to an event stream or trigger that will only be called
+   * once. After the first call, the handler will be automatically unbound.
+   */
+  bindOnce<T>(eventStream: EventStream<T>, handler: Handler<App<State, Context, TriggerMap>, T>): symbol
+  bindOnce<K extends keyof TriggerMap>(
+    triggerId: K,
+    handler: Handler<App<State, Context, TriggerMap>, TriggerMap[K]>
+  ): symbol
   onStop(handler: (app: App<State, Context, TriggerMap>) => void): symbol
 }
 
@@ -72,16 +81,32 @@ class _Builder<
 
   private bindEventStream<T>(
     eventStream: EventStream<T>,
-    handler: Handler<App<State, Context, TriggerMap>, T>
+    handler_: Handler<App<State, Context, TriggerMap>, T>,
+    once = false
   ): symbol {
+    let handler = handler_
+    if (once) {
+      handler = (k,x,id) => {
+        handler_(k,x,id)
+        k.unbind(id)
+      }
+    }
     const id = Symbol()
     this.eventHandlers.set(id, [eventStream, handler])
     return id
   }
   private bindTriggerHandler<K extends keyof TriggerMap>(
     triggerId: K,
-    handler: Handler<App<State, Context, TriggerMap>, TriggerMap[K]>
+    handler_: Handler<App<State, Context, TriggerMap>, TriggerMap[K]>,
+    once = false
   ): symbol {
+    let handler = handler_
+    if (once) {
+      handler = (k,x,id) => {
+        handler_(k,x,id)
+        k.unbind(triggerId,id)
+      }
+    }
     const id = Symbol()
     if (!this.triggerHandlers.has(triggerId)) {
       this.triggerHandlers.set(triggerId, new Map())
@@ -94,6 +119,11 @@ class _Builder<
     return typeof a === "string"
       ? this.bindTriggerHandler(a, b)
       : this.bindEventStream(a, b)
+  }
+  bindOnce(a: any, b: any): symbol {
+    return typeof a === "string"
+      ? this.bindTriggerHandler(a, b, true)
+      : this.bindEventStream(a, b, true)
   }
   onStart(handler: (app: App<State, Context, TriggerMap>) => void): void {
     this.onStartHandlers.add(handler)
@@ -156,16 +186,33 @@ class _App<
 
   private bindEventStream<T>(
     eventStream: EventStream<T>,
-    handler: Handler<App<State, Context, TriggerMap>, T>, id: symbol = Symbol()
+    handler_: Handler<App<State, Context, TriggerMap>, T>,
+    id: symbol,
+    once = false
   ): symbol {
+    let handler = handler_
+    if (once) {
+      handler = (k,x,id) => {
+        handler_(k,x,id)
+        k.unbind(id)
+      }
+    }
     const cctlr = eventStream.listen(payload => handler(this, payload, id))
     this.cancelControllers.set(id, cctlr)
     return id
   }
   private bindTriggerHandler<K extends keyof TriggerMap>(
     triggerId: K,
-    handler: Handler<App<State, Context, TriggerMap>, TriggerMap[K]>
+    handler_: Handler<App<State, Context, TriggerMap>, TriggerMap[K]>,
+    once = false
   ): symbol {
+    let handler = handler_
+    if (once) {
+      handler = (k,x,id) => {
+        handler_(k,x,id)
+        k.unbind(triggerId,id)
+      }
+    }
     const id = Symbol()
     let handlers = this.triggerHandlers.get(triggerId)
     if (!handlers) {
@@ -205,9 +252,14 @@ class _App<
   bind(a: any, b: any): symbol {
     return typeof a === "string"
       ? this.bindTriggerHandler(a, b)
-      : this.bindEventStream(a, b)
+      : this.bindEventStream(a, b, Symbol())
   }
-  onStop(handler: (app: App<State, Context, TriggerMap>) => void): symbol {
+  bindOnce(a: any, b: any): symbol {
+    return typeof a === "string"
+      ? this.bindTriggerHandler(a, b, true)
+      : this.bindEventStream(a, b, Symbol(), true)
+  }
+  onStop(handler: (k: App<State, Context, TriggerMap>) => void): symbol {
     const id = Symbol()
     this.onStopHandlers.set(id, handler)
     return id
