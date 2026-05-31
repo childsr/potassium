@@ -27,19 +27,11 @@ interface AppShared<State, Context, TriggerMap extends Record<string, any>> {
   onStop(handler: (app: App<State, Context, TriggerMap>) => void): symbol
 }
 
-export interface Builder<
-  State,
-  Context,
-  TriggerMap extends Record<string, any>
-> extends AppShared<State, Context, TriggerMap> {
+export interface Builder<State,Context,TriggerMap extends Record<string, any>> extends AppShared<State, Context, TriggerMap> {
   onStart(handler: (app: App<State, Context, TriggerMap>) => void): void
   start(initialState: State): Promise<State>
 }
-export interface App<
-  State,
-  Context,
-  TriggerMap extends Record<string, any>
-> extends AppShared<State, Context, TriggerMap> {
+export interface App<State,Context,TriggerMap extends Record<string, any>> extends AppShared<State, Context, TriggerMap> {
   readonly context: Context
   state: State
 
@@ -53,11 +45,7 @@ export interface App<
   stop(): void
 }
 
-class _Builder<
-  State,
-  Context,
-  TriggerMap extends Record<string, any>
-> implements Builder<State, Context, TriggerMap> {
+class _Builder<State,Context,TriggerMap extends Record<string, any>> implements Builder<State, Context, TriggerMap> {
   private triggerHandlers: Map<
     keyof TriggerMap,
     Map<symbol, Handler<App<State, Context, TriggerMap>, any>>
@@ -148,23 +136,19 @@ class _Builder<
   }
 }
 
-type HandlerMap<State, Context, TriggerMap extends Record<string, any>> = {
-  triggerHandlers: Map<keyof TriggerMap, Map<symbol, Handler<App<State, Context, TriggerMap>, any>>>
-  onStartHandlers: Set<VoidHandler<App<State, Context, TriggerMap>>>
-  onStopHandlers: Map<symbol, VoidHandler<App<State, Context, TriggerMap>>>
-  eventHandlers: Map<symbol, StreamHandlerPair<App<State, Context, TriggerMap>, any>>
-}
 type AppParameters<State, Context, TriggerMap extends Record<string, any>> = {
   initialState: State
   context: Context
-  handlers: HandlerMap<State, Context, TriggerMap>
+  handlers: {
+    triggerHandlers: Map<keyof TriggerMap, Map<symbol, Handler<App<State, Context, TriggerMap>, any>>>
+    onStartHandlers: Set<VoidHandler<App<State, Context, TriggerMap>>>
+    onStopHandlers: Map<symbol, VoidHandler<App<State, Context, TriggerMap>>>
+    eventHandlers: Map<symbol, StreamHandlerPair<App<State, Context, TriggerMap>, any>>
+  }
   resolve: (finalState: State) => void
 }
-class _App<
-  State,
-  Context,
-  TriggerMap extends Record<string, any>
-> implements App<State, Context, TriggerMap> {
+
+class _App<State,Context,TriggerMap extends Record<string, any>> implements App<State, Context, TriggerMap> {
   readonly context: Context
   state: State
 
