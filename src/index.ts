@@ -80,16 +80,13 @@ class _Builder<
   }
 
   private bindEventStream<T>(
-    eventStream: EventStream<T>,
-    handler_: Handler<App<State, Context, TriggerMap>, T>,
+    eventStream_: EventStream<T>,
+    handler: Handler<App<State, Context, TriggerMap>, T>,
     once = false
   ): symbol {
-    let handler = handler_
+    let eventStream = eventStream_
     if (once) {
-      handler = (k,x,id) => {
-        handler_(k,x,id)
-        k.unbind(id)
-      }
+      eventStream = eventStream.take(1)
     }
     const id = Symbol()
     this.eventHandlers.set(id, [eventStream, handler])
@@ -185,19 +182,18 @@ class _App<
   private resolve: (finalState: State) => void
 
   private bindEventStream<T>(
-    eventStream: EventStream<T>,
-    handler_: Handler<App<State, Context, TriggerMap>, T>,
+    eventStream_: EventStream<T>,
+    handler: Handler<App<State, Context, TriggerMap>, T>,
     id: symbol,
     once = false
   ): symbol {
-    let handler = handler_
+    let eventStream = eventStream_
     if (once) {
-      handler = (k,x,id) => {
-        handler_(k,x,id)
-        k.unbind(id)
-      }
+      eventStream = eventStream.take(1)
     }
-    const cctlr = eventStream.listen(payload => handler(this, payload, id))
+    const cctlr = eventStream
+      .onCancel(() => { this.cancelControllers.delete(id) })
+      .listen(payload => handler(this, payload, id))
     this.cancelControllers.set(id, cctlr)
     return id
   }
